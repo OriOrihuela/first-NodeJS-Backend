@@ -6,19 +6,19 @@
 "use strict";
 
 // Call these two modules.
-const express = require("express");
-const bodyParser = require("body-parser");
+const EXPRESS = require("express");
+const BODYPARSER = require("body-parser");
 
 // Call this module.
-const app = express();
+const APP = EXPRESS();
 
 /**
  * Middlewares of body-parser
  * Whatever the body gets, it will conveted into a JSON.
  */
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+APP.use(BODYPARSER.urlencoded({ extended: false }));
+APP.use(BODYPARSER.json());
 
 
 // Export the module
-module.exports = app;
+module.exports = APP;

@@ -4,8 +4,8 @@
  * It also serves to use new JS functionalities
  */
 "use strict";
-const app = require("./app");
-const port = process.env.PORT || 1212;
+const APP = require("./app");
+const PORT = process.env.PORT || 1212;
 
 /**
  * Mongoose provides a straight-forward, schema-based solution to model your application data.
@@ -13,20 +13,20 @@ const port = process.env.PORT || 1212;
  *                              ---------
  * Create the mongoose variable to be able to connect to the specified MongoDB database.
  */
-const mongoose = require("mongoose");
+const MONGOOSE = require("mongoose");
 
 /**
  * In this sentence, we connect the Mongoose plugin to the selected database.
  * We also provide the connection to the desired port, charged
  */
-mongoose.connect(
+MONGOOSE.connect(
   "mongodb://localhost:27017/ZOO",
   { useUnifiedTopology: true, useNewUrlParser: true },
   (error, answer) => {
     if (error) {
       throw error;
     } else {
-      app.listen(port, () => {
+      APP.listen(PORT, () => {
           console.log("El servidor local con Node y Express se ejecuta correctamente.")
       });
     }
