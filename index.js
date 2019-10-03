@@ -27,7 +27,9 @@ MONGOOSE.connect(
       throw error;
     } else {
       APP.listen(PORT, () => {
-          console.log("El servidor local con Node y Express se ejecuta correctamente.")
+        console.log(
+          "The local server with NodeJS and ExpressJS works properly."
+        );
       });
     }
   }
