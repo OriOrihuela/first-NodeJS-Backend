@@ -16,6 +16,6 @@ const USER_CONTROLLER = require("../controllers/user.controller");
  * Our router and its routes.
  */
 const API = EXPRESS.Router();
-API.get("/pruebas-del-controlador", USER_CONTROLLER.test);
+API.get("/controller-test", USER_CONTROLLER.test);
 
 module.exports = API;
