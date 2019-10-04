@@ -18,7 +18,7 @@ const User = require("../domain/model/user.model");
 /**
  * Services
  */
-const JWT_SERVICE = require("../services/jwt");
+const JWT_SERVICE = require("../services/jwt.service");
 
 /**
  * ACTIONS
@@ -137,9 +137,20 @@ function persistUser(user, response) {
 }
 
 /**
+ * TEST FUNCTION TO CHECK THE CONTROLLER
+ */
+function test(request, response) {
+  response.status(200).send({
+    message: "Testing the user controller and the test action.",
+    user: request.user
+  });
+}
+
+/**
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
   saveUser,
-  login
+  login,
+  test
 };

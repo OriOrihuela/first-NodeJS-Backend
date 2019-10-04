@@ -11,13 +11,16 @@
  */
 const JWT = require("jwt-simple");
 const MOMENT = require("moment");
+
 /**
  * This key is added to the token, and it is generated here.
  * So nobody will be able to generate the token even if has the same data in the PAYLOAD object.
  */
 const SECRET_KEY = "ori_orihuela_secret_key";
 
-// ACTIONS
+/**
+ * Actions
+ */
 function createToken(user) {
   // It is needed a payload object which JWT will interact with.
   const PAYLOAD = {
