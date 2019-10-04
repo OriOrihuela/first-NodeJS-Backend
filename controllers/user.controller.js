@@ -18,12 +18,6 @@ const User = require("../domain/model/user.model");
 /**
  * ACTIONS
  */
-function test(request, response) {
-  response.status(200).send({
-    message: "Testing the user controller and the action test"
-  });
-}
-
 function saveUser(request, response) {
   // Create the User object
   const USER = new User();
@@ -41,13 +35,13 @@ function saveUser(request, response) {
       {
         email: USER.email.toLowerCase()
       },
-      (error, user) => {
+      (error, isSetUser) => {
         if (error) {
           response.status(500).send({
             message: "Error checking the user exists."
           });
         } else {
-          if (!user) {
+          if (!isSetUser) {
             // Encrypting the password.
             BCRYPT.hash(PARAMS.password, 3, function(error, hash) {
               USER.password = hash;
@@ -69,6 +63,46 @@ function saveUser(request, response) {
   }
 }
 
+function login(request, response) {
+  const PARAMS = request.body;
+  const EMAIL = PARAMS.email;
+  const PASSWORD = PARAMS.password;
+
+  // Looking if the user already exists.
+  User.findOne(
+    {
+      email: EMAIL.toLowerCase()
+    },
+    (error, user) => {
+      if (error) {
+        response.status(500).send({
+          message: "Error checking if the user exists."
+        });
+      } else {
+        if (user) {
+          // Here the password is checked. In case it is the same, the function wiill return the user.
+          BCRYPT.compare(PASSWORD, user.password, (error, check) => {
+            if (check) {
+              response.status(200).send({
+                user
+              });
+            } else {
+              response.status(404).send({
+                message: "The user password is not correct."
+              });
+            }
+          });
+          // In case the user is not in the registered in the Database, the function will throw an error.
+        } else {
+          response.status(404).send({
+            message: "The user could not login."
+          });
+        }
+      }
+    }
+  );
+}
+
 function persistUser(user, response) {
   user.save((error, userStored) => {
     if (error) {
@@ -82,8 +116,7 @@ function persistUser(user, response) {
         });
       } else {
         response.status(200).send({
-          user: userStored,
-          message: "The user has been stored in the DB."
+          user: userStored
         });
       }
     }
@@ -94,6 +127,6 @@ function persistUser(user, response) {
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
-  test,
-  saveUser
+  saveUser,
+  login
 };
