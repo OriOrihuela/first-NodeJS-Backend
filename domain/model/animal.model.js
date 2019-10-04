@@ -8,21 +8,24 @@
 /**
  * Call the mongoose dependency to extract the schema from the DB.
  */
-const MONGOOSE = require("require");
-const SCHEMA = MONGOOSE.SCHEMA;
+const MONGOOSE = require("mongoose");
+const SCHEMA = MONGOOSE.Schema;
 
 /**
  * Create the MODEL.
  */
-const ANIMAL_SCHEMA = SCHEMA({
-  name: String,
-  description: String,
-  year: Number,
-  image: String,
-  user: {
-    type: SCHEMA.ObjectId,
-    ref: "User"
-  }
-});
+const ANIMAL_SCHEMA = SCHEMA(
+  {
+    name: String,
+    description: String,
+    year: Number,
+    image: String,
+    user: {
+      type: SCHEMA.ObjectId,
+      ref: "User"
+    }
+  },
+  { versionKey: false }
+);
 
 module.exports = MONGOOSE.model("Animal", ANIMAL_SCHEMA);

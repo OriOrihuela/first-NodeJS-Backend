@@ -8,18 +8,24 @@
 /**
  * Call the mongoose module to extract the schema from the DB.
  */
-const MONGOOSE = require("require");
-const SCHEMA = MONGOOSE.SCHEMA;
+const MONGOOSE = require("mongoose");
+const SCHEMA = MONGOOSE.Schema;
 
 /**
  * Create the MODEL.
  */
-const USER_SCHEMA = SCHEMA({
-  name: String,
-  surname: String,
-  email: String,
-  password: String,
-  role: String
-});
+const USER_SCHEMA = SCHEMA(
+  {
+    name: String,
+    surname: String,
+    email: String,
+    password: String,
+    role: String,
+    image: String
+  },
+  {
+    versionKey: false
+  }
+);
 
 module.exports = MONGOOSE.model("User", USER_SCHEMA);

@@ -17,5 +17,6 @@ const USER_CONTROLLER = require("../controllers/user.controller");
  */
 const API = EXPRESS.Router();
 API.get("/controller-test", USER_CONTROLLER.test);
+API.post("/register", USER_CONTROLLER.saveUser);
 
 module.exports = API;
