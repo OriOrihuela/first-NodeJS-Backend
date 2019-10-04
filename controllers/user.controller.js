@@ -16,6 +16,11 @@ const BCRYPT = require("bcrypt");
 const User = require("../domain/model/user.model");
 
 /**
+ * Services
+ */
+const JWT_SERVICE = require("../services/jwt");
+
+/**
  * ACTIONS
  */
 function saveUser(request, response) {
@@ -83,9 +88,17 @@ function login(request, response) {
           // Here the password is checked. In case it is the same, the function wiill return the user.
           BCRYPT.compare(PASSWORD, user.password, (error, check) => {
             if (check) {
-              response.status(200).send({
-                user
-              });
+              // Checking if there is any token for the desired user. If not, generate one.
+              if (PARAMS.getToken) {
+                // Return the JWT Token.
+                response.status(200).send({
+                  token: JWT_SERVICE.createToken(user)
+                });
+              } else {
+                response.status(200).send({
+                  user
+                });
+              }
             } else {
               response.status(404).send({
                 message: "The user password is not correct."
