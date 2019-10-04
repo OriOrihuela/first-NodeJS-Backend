@@ -26,39 +26,58 @@ function test(request, response) {
 
 function saveUser(request, response) {
   // Create the User object
-  const user = new User();
+  const USER = new User();
   // Get the body response with the body-parser, which converts the response in JSON.
   const PARAMS = request.body;
   // Assign values to the User object.
   if (PARAMS.name && PARAMS.surname && PARAMS.email && PARAMS.password) {
-    user.name = PARAMS.name;
-    user.surname = PARAMS.surname;
-    user.email = PARAMS.email;
-    user.role = "ROLE_USER";
-    user.image = null;
+    USER.name = PARAMS.name;
+    USER.surname = PARAMS.surname;
+    USER.email = PARAMS.email;
+    USER.role = "ROLE_USER";
+    USER.image = null;
 
-    // Encrypting the password.
-    BCRYPT.hash(PARAMS.password, 3, function(error, hash) {
-      user.password = hash;
-      // Saving the User object in the DB.
-      user.save((error, userStored) => {
+    User.findOne(
+      {
+        email: USER.email.toLowerCase()
+      },
+      (error, user) => {
         if (error) {
           response.status(500).send({
-            message: "Error when trying to save the user"
+            message: "Error checking the user exists."
           });
         } else {
-          if (!userStored) {
-            response.status(404).send({
-              message: "The user is not registered in the DataBase"
+          if (!user) {
+            // Encrypting the password.
+            BCRYPT.hash(PARAMS.password, 3, function(error, hash) {
+              USER.password = hash;
+              // Saving the user object in the DB.
+              USER.save((error, userStored) => {
+                if (error) {
+                  response.status(500).send({
+                    message: "Error when trying to save the user."
+                  });
+                } else {
+                  if (!userStored) {
+                    response.status(404).send({
+                      message: "The user is not registered in the DataBase."
+                    });
+                  } else {
+                    response.status(200).send({
+                      user: userStored
+                    });
+                  }
+                }
+              });
             });
           } else {
             response.status(200).send({
-              user: userStored
+              message: "The user already exists."
             });
           }
         }
-      });
-    });
+      }
+    );
   } else {
     response.status(200).send({
       message: "Introduce properly the User data to be able to register it."
