@@ -52,23 +52,7 @@ function saveUser(request, response) {
             BCRYPT.hash(PARAMS.password, 3, function(error, hash) {
               USER.password = hash;
               // Saving the user object in the DB.
-              USER.save((error, userStored) => {
-                if (error) {
-                  response.status(500).send({
-                    message: "Error when trying to save the user."
-                  });
-                } else {
-                  if (!userStored) {
-                    response.status(404).send({
-                      message: "The user is not registered in the DataBase."
-                    });
-                  } else {
-                    response.status(200).send({
-                      user: userStored
-                    });
-                  }
-                }
-              });
+              persistUser(USER, response);
             });
           } else {
             response.status(200).send({
@@ -83,6 +67,27 @@ function saveUser(request, response) {
       message: "Introduce properly the User data to be able to register it."
     });
   }
+}
+
+function persistUser(user, response) {
+  user.save((error, userStored) => {
+    if (error) {
+      response.status(500).send({
+        message: "Error when trying to save the user."
+      });
+    } else {
+      if (!userStored) {
+        response.status(404).send({
+          message: "The user is not registered in the DataBase."
+        });
+      } else {
+        response.status(200).send({
+          user: userStored,
+          message: "The user has been stored in the DB."
+        });
+      }
+    }
+  });
 }
 
 /**
