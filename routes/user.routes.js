@@ -20,13 +20,16 @@ const MIDDLEWARE_UPLOAD = MULTIPART({ uploadDir: "./uploads/users" });
 
 // Our router and its routes.
 const API = EXPRESS.Router();
+
 // GET
 API.get("/get-image-file/:imageFile", USER_CONTROLLER.getImageFile);
 API.get("/keepers", USER_CONTROLLER.getKeepers);
+
 // POST
 API.post("/register", USER_CONTROLLER.saveUser);
 API.post("/login", USER_CONTROLLER.login);
 API.post("/upload-image-user/:id", [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_UPLOAD], USER_CONTROLLER.uploadImage);
+
 // PUT
 API.put(
   "/update-user/:id",

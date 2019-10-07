@@ -79,7 +79,6 @@ function updateUser(request, response) {
   const USER_ID = request.params.id;
   // The given data to update the user.
   const TO_UPDATE = request.body;
-  let PASSWORD_TO_UPDATE;
   // Checks if the user.id gotten is the same id of the user stored in the DB.
   if (USER_ID != request.user.sub) {
     return response.status(500).send({

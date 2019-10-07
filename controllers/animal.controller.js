@@ -120,11 +120,41 @@ function getAnimal(request, response) {
     });
 }
 
+function updateAnimal(request, response) {
+  // Gets the id of the desired animal.
+  const ANIMAL_ID = request.params.id;
+  // The data to be updated.
+  const UPDATE = request.body;
+  Animal.findByIdAndUpdate(
+    ANIMAL_ID,
+    UPDATE,
+    { new: true },
+    (error, animalUpdated) => {
+      if (error) {
+        response.status(500).send({
+          message: "Error in the update animal request."
+        });
+      } else {
+        if (!animalUpdated) {
+          response.status(404).send({
+            message: "The animal has not been updated."
+          });
+        } else {
+          response.status(200).send({
+            animal: animalUpdated
+          });
+        }
+      }
+    }
+  );
+}
+
 /**
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
   saveAnimal,
   getAnimals,
-  getAnimal
+  getAnimal,
+  updateAnimal
 };
