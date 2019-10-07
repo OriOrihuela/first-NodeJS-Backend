@@ -12,6 +12,8 @@
 const BCRYPT = require("bcrypt");
 // This variable allows us to work with the file library extension of NodeJS.
 const FS = require("fs");
+// To get acces to file routes within our file directory.
+const PATH = require("path");
 
 /**
  * Models
@@ -161,7 +163,7 @@ function uploadImage(request, response) {
       );
     } else {
       // Deletes the file in case th extension is not valid.
-      FS.unlink(FILE_PATH, (error) => {
+      FS.unlink(FILE_PATH, error => {
         if (error) {
           response.status(500).send({
             message: "No valid extension and file deleted."
@@ -178,6 +180,24 @@ function uploadImage(request, response) {
       message: "There are no uploaded files."
     });
   }
+}
+
+function getImageFile(request, response) {
+  // The image file passed by the request parameter.
+  const IMAGE_FILE = request.params.imageFile;
+  // The folder route of the desired image.
+  const PATH_FILE = "./uploads/users/" + IMAGE_FILE;
+  // Checks if the file really exists.
+  FS.exists(PATH_FILE, function(exists) {
+    if (exists) {
+      // Sends to file to the as a response.
+      response.sendFile(PATH.resolve(PATH_FILE));
+    } else {
+      response.status(404).send({
+        message: "The image does not exist."
+      });
+    }
+  });
 }
 
 function login(request, response) {
@@ -267,5 +287,6 @@ module.exports = {
   login,
   test,
   updateUser,
-  uploadImage
+  uploadImage,
+  getImageFile
 };
