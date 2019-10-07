@@ -65,9 +65,36 @@ function persistAnimal(animal, response) {
   });
 }
 
+function getAnimals(request, response) {
+  /**
+   * If the find() parameters is empty, returns the entire collection.
+   * The populate parameter makes references to the "user" object id related to the
+   * users collection in the DB.
+   */
+  Animal.find({})
+    .populate({ path: "user" })
+    .exec((error, animals) => {
+      if (error) {
+        response.status(500).send({
+          message: "Error in the animals request."
+        });
+      } else {
+        if (!animals) {
+          response.status(404).send({
+            message: "There are no animals in the DB ."
+          });
+        } else {
+          response.status(200).send({
+            animals
+          });
+        }
+      }
+    });
+}
+
 /**
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
-  saveAnimal
+  saveAnimal, getAnimals
 };
