@@ -20,5 +20,10 @@ const API = EXPRESS.Router();
 API.get("/test", MIDDLEWARE_AUTH.ensureAuth, USER_CONTROLLER.test);
 API.post("/register", USER_CONTROLLER.saveUser);
 API.post("/login", USER_CONTROLLER.login);
+API.put(
+  "/update-user/:id",
+  MIDDLEWARE_AUTH.ensureAuth,
+  USER_CONTROLLER.updateUser
+);
 
 module.exports = API;

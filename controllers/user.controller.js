@@ -68,6 +68,45 @@ function saveUser(request, response) {
   }
 }
 
+// The user must be logged in!.
+function updateUser(request, response) {
+  // The user.id given by parameter.
+  const USER_ID = request.params.id;
+  // The given data to update the user.
+  const TO_UPDATE = request.body;
+  let PASSWORD_TO_UPDATE;
+  // Checks if the user.id gotten is the same id of the user stored in the DB.
+  if (USER_ID != request.user.sub) {
+    return response.status(500).send({
+      message: "You do not have permission to update the user."
+    });
+  }
+  User.findByIdAndUpdate(
+    USER_ID,
+    TO_UPDATE,
+    { new: true },
+    (error, userUpdated) => {
+      // In case there is any error when trying to update the user...
+      if (error) {
+        response.status(500).send({
+          message: "Error when updating the user."
+        });
+      } else {
+        // If the user is not updated...
+        if (!userUpdated) {
+          response.status(404).send({
+            message: "The user cannot be updated."
+          });
+        } else {
+          response.status(200).send({
+            user: userUpdated
+          });
+        }
+      }
+    }
+  );
+}
+
 function login(request, response) {
   const PARAMS = request.body;
   const EMAIL = PARAMS.email;
@@ -128,6 +167,7 @@ function persistUser(user, response) {
           message: "The user is not registered in the DataBase."
         });
       } else {
+        // Saves the user in the DB.
         response.status(200).send({
           user: userStored
         });
@@ -152,5 +192,6 @@ function test(request, response) {
 module.exports = {
   saveUser,
   login,
-  test
+  test,
+  updateUser
 };
