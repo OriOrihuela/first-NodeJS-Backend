@@ -8,7 +8,12 @@
 /**
  * Modules
  */
+// Used to crypt passwords.
 const BCRYPT = require("bcrypt");
+// This variable allows us to work with the file library extension of NodeJS.
+const FS = require("fs");
+// To get acces to file routes within our file directory.
+const PATH = require("path");
 
 /**
  * Models
@@ -66,6 +71,155 @@ function saveUser(request, response) {
       message: "Introduce properly the User data to be able to register it."
     });
   }
+}
+
+// The user must be logged in!.
+function updateUser(request, response) {
+  // The user.id given by parameter.
+  const USER_ID = request.params.id;
+  // The given data to update the user.
+  const TO_UPDATE = request.body;
+  // Checks if the user.id gotten is the same id of the user stored in the DB.
+  if (USER_ID != request.user.sub) {
+    return response.status(500).send({
+      message: "You do not have permission to update the user."
+    });
+  }
+  User.findByIdAndUpdate(
+    USER_ID,
+    TO_UPDATE,
+    { new: true },
+    (error, userUpdated) => {
+      // In case there is any error when trying to update the user...
+      if (error) {
+        response.status(500).send({
+          message: "Error when updating the user."
+        });
+      } else {
+        // If the user is not updated...
+        if (!userUpdated) {
+          response.status(404).send({
+            message: "The user cannot be updated."
+          });
+        } else {
+          response.status(200).send({
+            user: userUpdated
+          });
+        }
+      }
+    }
+  );
+}
+
+function uploadImage(request, response) {
+  // The user.id given by parameter.
+  const USER_ID = request.params.id;
+  let fileName = "Not updated...";
+  // Checks if there are files in the given request.
+  if (request.files) {
+    // This variable gives us the path of the image to upload.
+    const FILE_PATH = request.files.image.path;
+    // Splits the path into an array of the elementes divided by "\\".
+    const FILE_SPLIT = FILE_PATH.split("\\");
+    // The entire file name and its extension.
+    fileName = FILE_SPLIT[2];
+    const EXTENSION_SPLIT = fileName.split(".");
+    const FILE_EXTENSION = EXTENSION_SPLIT[1];
+    if (
+      FILE_EXTENSION == "png" ||
+      FILE_EXTENSION == "jpg" ||
+      FILE_EXTENSION == "jpeg" ||
+      FILE_EXTENSION == "gif"
+    ) {
+      if (USER_ID != request.user.sub) {
+        return response.status(500).send({
+          message: "You do not have permission to update the user."
+        });
+      }
+      User.findByIdAndUpdate(
+        USER_ID,
+        { image: fileName },
+        { new: true },
+        (error, userUpdated) => {
+          // In case there is any error when trying to update the user...
+          if (error) {
+            response.status(500).send({
+              message: "Error when updating the user."
+            });
+          } else {
+            // If the user is not updated...
+            if (!userUpdated) {
+              response.status(404).send({
+                message: "The user cannot be updated."
+              });
+            } else {
+              response.status(200).send({
+                user: userUpdated
+              });
+            }
+          }
+        }
+      );
+    } else {
+      // Deletes the file in case th extension is not valid.
+      FS.unlink(FILE_PATH, error => {
+        if (error) {
+          response.status(500).send({
+            message: "No valid extension and file deleted."
+          });
+        } else {
+          response.status(500).send({
+            message: "No valid extension."
+          });
+        }
+      });
+    }
+  } else {
+    response.status(500).send({
+      message: "There are no uploaded files."
+    });
+  }
+}
+
+function getImageFile(request, response) {
+  // The image file passed by the request parameter.
+  const IMAGE_FILE = request.params.imageFile;
+  // The folder route of the desired image.
+  const PATH_FILE = "./uploads/users/" + IMAGE_FILE;
+  // Checks if the file really exists.
+  FS.exists(PATH_FILE, function(exists) {
+    if (exists) {
+      // Sends to file to the as a response.
+      response.sendFile(PATH.resolve(PATH_FILE));
+    } else {
+      response.status(404).send({
+        message: "The image does not exist."
+      });
+    }
+  });
+}
+
+function getKeepers(request, response) {
+  // This line will find any user who has a role as "ROLE_ADMIN"; the JSON serves as "WHERE" parameter.
+  User.find({
+    role: "ROLE_ADMIN"
+  }).exec((error, users) => {
+    if (error) {
+      response.status(500).send({
+        message: "Error in the request."
+      });
+    } else {
+      if (!users) {
+        response.status(404).send({
+          message: "There are not keepers."
+        });
+      } else {
+        response.status(200).send({
+          users
+        });
+      }
+    }
+  });
 }
 
 function login(request, response) {
@@ -128,6 +282,7 @@ function persistUser(user, response) {
           message: "The user is not registered in the DataBase."
         });
       } else {
+        // Saves the user in the DB.
         response.status(200).send({
           user: userStored
         });
@@ -137,20 +292,13 @@ function persistUser(user, response) {
 }
 
 /**
- * TEST FUNCTION TO CHECK THE CONTROLLER
- */
-function test(request, response) {
-  response.status(200).send({
-    message: "Testing the user controller and the test action.",
-    user: request.user
-  });
-}
-
-/**
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
   saveUser,
   login,
-  test
+  updateUser,
+  uploadImage,
+  getImageFile,
+  getKeepers
 };

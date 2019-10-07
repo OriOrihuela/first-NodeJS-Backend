@@ -21,9 +21,11 @@ APP.use(BODYPARSER.json());
 
 // Load our routes
 const USER_ROUTES = require("./routes/user.routes");
+const ANIMAL_ROUTES = require("./routes/animal.routes");
 
 // Base routes, with their own routing prefix.
 APP.use("/api", USER_ROUTES);
+APP.use("/api", ANIMAL_ROUTES);
 
 // Export the module
 module.exports = APP;
