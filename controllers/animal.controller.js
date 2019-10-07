@@ -92,9 +92,39 @@ function getAnimals(request, response) {
     });
 }
 
+function getAnimal(request, response) {
+  // Gets the id of the desired animal.
+  const ANIMAL_ID = request.params.id;
+  /**
+   * Searches the requested animal in the DB.
+   * Remember to add .populate({path: "user"}), to reference the user property in the Animal Model.
+   */
+  Animal.findById(ANIMAL_ID)
+    .populate({ path: "user" })
+    .exec((error, animal) => {
+      if (error) {
+        response.status(500).send({
+          message: "Error in the animal request."
+        });
+      } else {
+        if (!animal) {
+          response.status(404).send({
+            message: "The requested animal does not exist."
+          });
+        } else {
+          response.status(200).send({
+            animal
+          });
+        }
+      }
+    });
+}
+
 /**
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
-  saveAnimal, getAnimals
+  saveAnimal,
+  getAnimals,
+  getAnimal
 };

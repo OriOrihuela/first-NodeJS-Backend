@@ -22,6 +22,7 @@ const MIDDLEWARE_UPLOAD = MULTIPART({ uploadDir: "./uploads/animals" });
 const API = EXPRESS.Router();
 // GET
 API.get("/animals", ANIMAL_CONTROLLER.getAnimals);
+API.get("/animal/:id", ANIMAL_CONTROLLER.getAnimal);
 // POST
 API.post("/animal", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.saveAnimal);
 
