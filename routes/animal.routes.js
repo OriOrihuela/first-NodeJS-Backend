@@ -21,6 +21,8 @@ const MIDDLEWARE_UPLOAD = MULTIPART({ uploadDir: "./uploads/animals" });
 // Our router and its routes.
 const API = EXPRESS.Router();
 // GET
-API.get("/testAnimal", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.testAnimal);
+
+// POST
+API.post("/animal", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.saveAnimal);
 
 module.exports = API;

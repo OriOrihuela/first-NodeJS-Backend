@@ -22,10 +22,46 @@ const Animal = require("../domain/model/animal.model");
 /**
  * ACTIONS
  */
-function testAnimal(request, response) {
-  response.status(200).send({
-    message: "Testing the animal.controller.js.",
-    user: request.user
+function saveAnimal(request, response) {
+  // Create the animal object
+  const ANIMAL = new Animal();
+  // Get the data from the request.
+  const PARAMS = request.body;
+  // Cheks if the request has the name property.
+  if (PARAMS.name) {
+    // Apply the request data to the animal object.
+    ANIMAL.name = PARAMS.name;
+    ANIMAL.description = PARAMS.description;
+    ANIMAL.year = PARAMS.year;
+    ANIMAL.image = null;
+    ANIMAL.user = request.user.sub;
+    // Save the animal.
+    persistAnimal(ANIMAL, response);
+  } else {
+    response.status(404).send({
+      message: "The animal name is required."
+    });
+  }
+}
+
+function persistAnimal(animal, response) {
+  animal.save((error, animalStored) => {
+    if (error) {
+      response.status(500).send({
+        message: "Error in the server."
+      });
+    } else {
+      if (!animalStored) {
+        response.status(404).send({
+          message: "The animal has not been stored."
+        });
+      } else {
+        // Saves the animal in the DB.
+        response.status(200).send({
+          animal: animalStored
+        });
+      }
+    }
   });
 }
 
@@ -33,5 +69,5 @@ function testAnimal(request, response) {
  * It is needed to export the functions to be able to use them.
  */
 module.exports = {
-    testAnimal
-  };
+  saveAnimal
+};
