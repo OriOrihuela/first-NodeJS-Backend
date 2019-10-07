@@ -23,6 +23,7 @@ const API = EXPRESS.Router();
 // GET
 API.get("/test", MIDDLEWARE_AUTH.ensureAuth, USER_CONTROLLER.test);
 API.get("/get-image-file/:imageFile", USER_CONTROLLER.getImageFile);
+API.get("/keepers", USER_CONTROLLER.getKeepers);
 // POST
 API.post("/register", USER_CONTROLLER.saveUser);
 API.post("/login", USER_CONTROLLER.login);

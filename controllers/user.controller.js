@@ -200,6 +200,29 @@ function getImageFile(request, response) {
   });
 }
 
+function getKeepers(request, response) {
+  // This line will find any user who has a role as "ROLE_ADMIN"; the JSON serves as "WHERE" parameter.
+  User.find({
+    role: "ROLE_ADMIN"
+  }).exec((error, users) => {
+    if (error) {
+      response.status(500).send({
+        message: "Error in the request."
+      });
+    } else {
+      if (!users) {
+        response.status(404).send({
+          message: "There are not keepers."
+        });
+      } else {
+        response.status(200).send({
+          users
+        });
+      }
+    }
+  });
+}
+
 function login(request, response) {
   const PARAMS = request.body;
   const EMAIL = PARAMS.email;
@@ -288,5 +311,6 @@ module.exports = {
   test,
   updateUser,
   uploadImage,
-  getImageFile
+  getImageFile,
+  getKeepers
 };
