@@ -149,8 +149,31 @@ function updateAnimal(request, response) {
   );
 }
 
+function deleteAnimal(request, response) {
+  // The animal.id given by parameter.
+  const ANIMAL_ID = request.params.id;
+
+  Animal.findByIdAndRemove(ANIMAL_ID, (error, animalRemoved) => {
+    if (error) {
+      response.status(500).send({
+        message: "Error in the request."
+      });
+    } else {
+      if (!animalRemoved) {
+        response.status(404).send({
+          message: "The animal cannot be removed."
+        });
+      } else {
+        response.status(500).send({
+          animal: animalRemoved
+        });
+      }
+    }
+  });
+}
+
 function uploadImage(request, response) {
-  // The user.id given by parameter.
+  // The animal.id given by parameter.
   const ANIMAL_ID = request.params.id;
   let fileName = "Not updated...";
   // Checks if there are files in the given request.
@@ -174,13 +197,13 @@ function uploadImage(request, response) {
         { image: fileName },
         { new: true },
         (error, animalUpdated) => {
-          // In case there is any error when trying to update the user...
+          // In case there is any error when trying to update the animal...
           if (error) {
             response.status(500).send({
               message: "Error when updating the animal."
             });
           } else {
-            // If the user is not updated...
+            // If the animal is not updated...
             if (!animalUpdated) {
               response.status(404).send({
                 message: "The animal cannot be updated."
@@ -194,7 +217,7 @@ function uploadImage(request, response) {
         }
       );
     } else {
-      // Deletes the file in case th extension is not valid.
+      // Deletes the file in case the extension is not valid.
       FS.unlink(FILE_PATH, error => {
         if (error) {
           response.status(500).send({
@@ -241,5 +264,6 @@ module.exports = {
   getAnimal,
   updateAnimal,
   uploadImage,
-  getImageFile
+  getImageFile,
+  deleteAnimal
 };
