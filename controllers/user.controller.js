@@ -8,7 +8,10 @@
 /**
  * Modules
  */
+// Used to crypt passwords.
 const BCRYPT = require("bcrypt");
+// This variable allows us to work with the file library extension of NodeJS.
+const FS = require("fs");
 
 /**
  * Models
@@ -107,6 +110,76 @@ function updateUser(request, response) {
   );
 }
 
+function uploadImage(request, response) {
+  // The user.id given by parameter.
+  const USER_ID = request.params.id;
+  let fileName = "Not updated...";
+  // Checks if there are files in the given request.
+  if (request.files) {
+    // This variable gives us the path of the image to upload.
+    const FILE_PATH = request.files.image.path;
+    // Splits the path into an array of the elementes divided by "\\".
+    const FILE_SPLIT = FILE_PATH.split("\\");
+    // The entire file name and its extension.
+    fileName = FILE_SPLIT[2];
+    const EXTENSION_SPLIT = fileName.split(".");
+    const FILE_EXTENSION = EXTENSION_SPLIT[1];
+    if (
+      FILE_EXTENSION == "png" ||
+      FILE_EXTENSION == "jpg" ||
+      FILE_EXTENSION == "jpeg" ||
+      FILE_EXTENSION == "gif"
+    ) {
+      if (USER_ID != request.user.sub) {
+        return response.status(500).send({
+          message: "You do not have permission to update the user."
+        });
+      }
+      User.findByIdAndUpdate(
+        USER_ID,
+        { image: fileName },
+        { new: true },
+        (error, userUpdated) => {
+          // In case there is any error when trying to update the user...
+          if (error) {
+            response.status(500).send({
+              message: "Error when updating the user."
+            });
+          } else {
+            // If the user is not updated...
+            if (!userUpdated) {
+              response.status(404).send({
+                message: "The user cannot be updated."
+              });
+            } else {
+              response.status(200).send({
+                user: userUpdated
+              });
+            }
+          }
+        }
+      );
+    } else {
+      // Deletes the file in case th extension is not valid.
+      FS.unlink(FILE_PATH, (error) => {
+        if (error) {
+          response.status(500).send({
+            message: "No valid extension and file deleted."
+          });
+        } else {
+          response.status(500).send({
+            message: "No valid extension."
+          });
+        }
+      });
+    }
+  } else {
+    response.status(500).send({
+      message: "There are no uploaded files."
+    });
+  }
+}
+
 function login(request, response) {
   const PARAMS = request.body;
   const EMAIL = PARAMS.email;
@@ -193,5 +266,6 @@ module.exports = {
   saveUser,
   login,
   test,
-  updateUser
+  updateUser,
+  uploadImage
 };
