@@ -24,9 +24,11 @@ const API = EXPRESS.Router();
 // GET
 API.get("/animals", ANIMAL_CONTROLLER.getAnimals);
 API.get("/animal/:id", ANIMAL_CONTROLLER.getAnimal);
+API.get("/get-image-animal/:imageFile", ANIMAL_CONTROLLER.getImageFile);
 
 // POST
 API.post("/animal", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.saveAnimal);
+API.post("/upload-image-animal/:id", [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_UPLOAD], ANIMAL_CONTROLLER.uploadImage);
 
 // PUT
 API.put("/animal/:id", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.updateAnimal);

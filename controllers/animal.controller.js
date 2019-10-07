@@ -149,6 +149,89 @@ function updateAnimal(request, response) {
   );
 }
 
+function uploadImage(request, response) {
+  // The user.id given by parameter.
+  const ANIMAL_ID = request.params.id;
+  let fileName = "Not updated...";
+  // Checks if there are files in the given request.
+  if (request.files) {
+    // This variable gives us the path of the image to upload.
+    const FILE_PATH = request.files.image.path;
+    // Splits the path into an array of the elementes divided by "\\".
+    const FILE_SPLIT = FILE_PATH.split("\\");
+    // The entire file name and its extension.
+    fileName = FILE_SPLIT[2];
+    const EXTENSION_SPLIT = fileName.split(".");
+    const FILE_EXTENSION = EXTENSION_SPLIT[1];
+    if (
+      FILE_EXTENSION == "png" ||
+      FILE_EXTENSION == "jpg" ||
+      FILE_EXTENSION == "jpeg" ||
+      FILE_EXTENSION == "gif"
+    ) {
+      Animal.findByIdAndUpdate(
+        ANIMAL_ID,
+        { image: fileName },
+        { new: true },
+        (error, animalUpdated) => {
+          // In case there is any error when trying to update the user...
+          if (error) {
+            response.status(500).send({
+              message: "Error when updating the animal."
+            });
+          } else {
+            // If the user is not updated...
+            if (!animalUpdated) {
+              response.status(404).send({
+                message: "The animal cannot be updated."
+              });
+            } else {
+              response.status(200).send({
+                animal: animalUpdated
+              });
+            }
+          }
+        }
+      );
+    } else {
+      // Deletes the file in case th extension is not valid.
+      FS.unlink(FILE_PATH, error => {
+        if (error) {
+          response.status(500).send({
+            message: "No valid extension and file deleted."
+          });
+        } else {
+          response.status(500).send({
+            message: "No valid extension."
+          });
+        }
+      });
+    }
+  } else {
+    response.status(500).send({
+      message: "There are no uploaded files."
+    });
+  }
+}
+
+function getImageFile(request, response) {
+  // The image file passed by the request parameter.
+  const IMAGE_FILE = request.params.imageFile;
+  // The folder route of the desired image.
+  const PATH_FILE = "./uploads/animals/" + IMAGE_FILE;
+  // Checks if the file really exists.
+  FS.exists(PATH_FILE, function(exists) {
+    if (exists) {
+      // Sends to file to the as a response.
+      response.sendFile(PATH.resolve(PATH_FILE));
+    } else {
+      response.status(404).send({
+        message: "The image does not exist."
+      });
+    }
+  });
+}
+
 /**
  * It is needed to export the functions to be able to use them.
  */
@@ -156,5 +239,7 @@ module.exports = {
   saveAnimal,
   getAnimals,
   getAnimal,
-  updateAnimal
+  updateAnimal,
+  uploadImage,
+  getImageFile
 };
