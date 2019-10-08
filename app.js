@@ -19,6 +19,21 @@ const APP = EXPRESS();
 APP.use(BODYPARSER.urlencoded({ extended: false }));
 APP.use(BODYPARSER.json());
 
+// Configuration about headers and cors to allow AJAX requests from a domain to another, in our case from the client to our API.
+APP.use((request, response, next) => {
+  response.header("Acces-Control-Allow-Origin", "*");
+  response.header(
+    "Acces-Control-Allow-Headers",
+    "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method"
+  );
+  response.header(
+    "Acces-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, DELETE"
+  );
+  response.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
+  next();
+});
+
 // Load our routes
 const USER_ROUTES = require("./routes/user.routes");
 const ANIMAL_ROUTES = require("./routes/animal.routes");

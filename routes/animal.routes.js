@@ -12,11 +12,16 @@
 const EXPRESS = require("express");
 const ANIMAL_CONTROLLER = require("../controllers/animal.controller");
 
-// Modules.
+/**
+ * Modules.
+ */
+// Middleware to check if the path is protected by a token.
 const MIDDLEWARE_AUTH = require("../middlewares/authenticated.middleware");
-// To save images or folders by the users.
+// Middleware to save images or folders by the users.
 const MULTIPART = require("connect-multiparty");
 const MIDDLEWARE_UPLOAD = MULTIPART({ uploadDir: "./uploads/animals" });
+// Middleware to avoid common users to edit important things.
+const MIDDLEWARE_ADMIN = require("../middlewares/is_admin.middleware");
 
 // Our router and its routes.
 const API = EXPRESS.Router();
@@ -27,24 +32,28 @@ API.get("/animal/:id", ANIMAL_CONTROLLER.getAnimal);
 API.get("/get-image-animal/:imageFile", ANIMAL_CONTROLLER.getImageFile);
 
 // POST
-API.post("/animal", MIDDLEWARE_AUTH.ensureAuth, ANIMAL_CONTROLLER.saveAnimal);
+API.post(
+  "/animal",
+  [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_ADMIN.isAdmin],
+  ANIMAL_CONTROLLER.saveAnimal
+);
 API.post(
   "/upload-image-animal/:id",
-  [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_UPLOAD],
+  [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_UPLOAD, MIDDLEWARE_ADMIN.isAdmin],
   ANIMAL_CONTROLLER.uploadImage
 );
 
 // PUT
 API.put(
   "/animal/:id",
-  MIDDLEWARE_AUTH.ensureAuth,
+  [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_ADMIN.isAdmin],
   ANIMAL_CONTROLLER.updateAnimal
 );
 
 // DELETE
 API.delete(
   "/animal/:id",
-  MIDDLEWARE_AUTH.ensureAuth,
+  [MIDDLEWARE_AUTH.ensureAuth, MIDDLEWARE_ADMIN.isAdmin],
   ANIMAL_CONTROLLER.deleteAnimal
 );
 
