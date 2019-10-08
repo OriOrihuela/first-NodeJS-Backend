@@ -164,8 +164,9 @@ function deleteAnimal(request, response) {
           message: "The animal cannot be removed."
         });
       } else {
-        response.status(500).send({
-          animal: animalRemoved
+        response.status(200).send({
+          animal: animalRemoved,
+          message: "The animal has been removed from the DB."
         });
       }
     }
